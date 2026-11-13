@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Notes Sharing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+    <div class="brand">📚 NotesHub</div>
+    <p>Share knowledge. Learn together.</p>
+</header>
+
+<main>
+    <section class="hero">
+        <h1>Student Notes Sharing Website</h1>
+        <p>Upload, find and download study materials in one place.</p>
+    </section>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}<div class="message">{{ message }}</div>{% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <section class="panel">
+        <h2>Upload Study Materials</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="text" name="title" placeholder="Notes title" required>
+            <input type="text" name="subject" placeholder="Subject name" required>
+            <input type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required>
+            <button type="submit">Upload Notes</button>
+        </form>
+        <small>Supported formats: PDF, DOC, DOCX, PPT, PPTX and TXT.</small>
+    </section>
+
+    <section class="notes-section">
+        <div class="section-heading">
+            <div><h2>Available Notes</h2><p>Browse materials shared by students.</p></div>
+            <form class="search" action="/" method="GET">
+                <input type="search" name="search" value="{{ search }}" placeholder="Search title or subject">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="notes">
+        {% for note in notes %}
+            <article class="note-card">
+                <div class="file-icon">📄</div>
+                <div class="note-info">
+                    <h3>{{ note.title }}</h3>
+                    <p>{{ note.subject }}</p>
+                    <span>{{ note.filename }}</span>
+                </div>
+                <div class="actions">
+                    <a class="download" href="{{ url_for('download', filename=note.filename) }}">Download</a>
+                    <form action="{{ url_for('delete', note_id=note.id) }}" method="POST"
+                          onsubmit="return confirm('Delete this note?')">
+                        <button class="delete" type="submit">Delete</button>
+                    </form>
+                </div>
+            </article>
+        {% else %}
+            <div class="empty">No notes found. Upload the first study material!</div>
+        {% endfor %}
+        </div>
+    </section>
+</main>
+<footer>Student Notes Sharing Website · FSD-2 Mini Project</footer>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
